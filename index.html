@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Challenge</title>
+
+    <link rel="stylesheet" href="stylesheets/main.css">
+
+    <script src="scripts/grid.js"></script>
+    <script>
+        const EMPTY = 0;
+        const PLAYER = 1;
+        const WALL = 2;
+
+        // TODO: need a map editor :(
+        const MAP = [
+            [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2],
+            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+        ];
+
+        class Challenge extends Grid {
+            cssClassMap = {
+                0: 'empty',
+                1: 'player',
+                2: 'wall'
+            };
+
+            constructor() {
+                let rows = 11;
+                let columns = 11;
+
+                super(rows, columns);
+
+                this.player = {
+                    x: 5,
+                    y: 5
+                };
+
+                this.renderMap();
+
+                this.gameOver = false;
+
+                window.addEventListener('keydown', this.onKeyDown.bind(this));
+
+                const gridRef = document.querySelector('#grid');
+                grid.addEventListener('touchstart', e => console.log('TODO touchstart'));
+            }
+
+            renderMap() {
+                let state = this.displayStateCopy();
+
+                // TODO: extract to "renderMap" function
+                let startX = this.player.x - 5 < 0 ? 0 : this.player.x - 5;
+                let startY = this.player.y - 5 < 0 ? 0 : this.player.y - 5;
+                console.log(startX, startY);
+
+                for (let x = 0; x < this.columns; x += 1) {
+                    for (let y = 0; y < this.rows; y += 1) {
+                        // NOTE: need to prevent accessing OOB map indices
+                        state[x][y] = MAP[startX + x][startY + y];
+                    }
+                }
+
+                // NOTE: the player always will be rendered in the middle of the grid,
+                // unless they are close to a wall
+                // TODO: currently hard-coded; this needs to be dynamic if player is less
+                // than 5 cells away from an edge of the map data
+                state[5][5] = PLAYER;
+
+
+                this.render(state);
+            }
+
+            onKeyDown(event) {
+                if (this.gameOver) {
+                    return;
+                }
+
+                // TODO: handle collision detection
+
+                switch (event.key) {
+                    case 'a':
+                    case 'ArrowLeft':
+                        // move left
+                        this.player.x -= 1;
+                        break;
+                    case 'd':
+                    case 'ArrowRight':
+                        this.player.x += 1;
+                        // move right
+                        break;
+                    case 'w':
+                    case 'ArrowUp':
+                        // move up
+                        this.player.y -= 1;
+                        break;
+                    case 's':
+                    case 'ArrowDown':
+                        // move down
+                        this.player.y += 1;
+                        break;
+                }
+
+                this.renderMap();
+            }
+
+            displayGameOver() {
+                window.alert('u lose, bro');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', e => {
+            new Challenge();
+        })
+
+    </script>
+</head>
+
+<body>
+    <div id="grid"></div>
+</body>
+
+</html>

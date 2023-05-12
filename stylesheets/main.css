@@ -1,0 +1,18 @@
+body {
+  background-color: #333;
+}
+
+#grid {
+  width: 50%;
+}
+
+#grid div {
+  background-color: #ddd;
+  border-right: 0.1rem solid black;
+  border-bottom: 0.1rem solid black;
+  position: relative;
+}
+
+#grid div.empty { background-color: #ddd; }
+#grid div.player { background-color: red; }
+#grid div.wall { background-color: darkslategray; }
