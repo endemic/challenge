@@ -10,7 +10,12 @@
     <script src="scripts/grid.js"></script>
     <script>
         const EMPTY = 0;
-        const PLAYER = 1;
+        const PLAYER = {
+            'left': 10,
+            'right': 11,
+            'up': 12,
+            'down': 13
+        };
         const WALL = 2;
         const KEY = 3;
         const ENEMY = 4;
@@ -56,7 +61,11 @@
                 1: 'player',
                 2: 'wall',
                 3: 'key',
-                4: 'enemy'
+                4: 'enemy',
+                10: 'player-left',
+                11: 'player-right',
+                12: 'player-up',
+                13: 'player-down',
             };
 
             constructor() {
@@ -67,7 +76,8 @@
 
                 this.player = {
                     x: 5,
-                    y: 5
+                    y: 5,
+                    direction: 'down'
                 };
 
                 this.inventory = [];
@@ -146,7 +156,8 @@
                     playerDrawY = this.player.y - startY;
                 }
 
-                state[playerDrawX][playerDrawY] = PLAYER;
+                state[playerDrawX][playerDrawY] = PLAYER[this.player.direction];
+                console.log(this.player.direction)
 
                 this.render(state);
             }
@@ -171,27 +182,32 @@
                     case 'ArrowLeft':
                         // move left
                         next.x -= 1;
+                        this.player.direction = 'left';
                         break;
                     case 'd':
                     case 'ArrowRight':
-                        next.x += 1;
                         // move right
+                        next.x += 1;
+                        this.player.direction = 'right';
                         break;
                     case 'w':
                     case 'ArrowUp':
                         // move up
                         next.y -= 1;
+                        this.player.direction = 'up';
                         break;
                     case 's':
                     case 'ArrowDown':
                         // move down
                         next.y += 1;
+                        this.player.direction = 'down';
                         break;
                 }
 
                 // basic collision detection
                 if (MAP[next.x][next.y] === EMPTY) {
-                    this.player = next;
+                    this.player.x = next.x;
+                    this.player.y = next.y;
                 }
 
                 this.renderMap();

@@ -6,13 +6,9 @@ body {
   width: 50%;
 }
 
-#grid div {
-  background-color: #ddd;
-  border-right: 0.1rem solid black;
-  border-bottom: 0.1rem solid black;
-  position: relative;
-}
-
-#grid div.empty { background-color: #ddd; }
-#grid div.player { background-color: red; }
-#grid div.wall { background-color: darkslategray; }
+#grid div.empty { background: url('../images/empty.png') center/100%; }
+#grid div.player-left { background: url('../images/player-left.png') center/100%; }
+#grid div.player-right { background: url('../images/player-right.png') center/100%; }
+#grid div.player-up { background: url('../images/player-up.png') center/100%; }
+#grid div.player-down { background: url('../images/player-down.png') center/100%; }
+#grid div.wall { background: url('../images/wall.png') center/100%; }
