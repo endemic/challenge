@@ -161,29 +161,37 @@
                     return;
                 }
 
-                // TODO: handle collision detection
+                let next = {
+                    x: this.player.x,
+                    y: this.player.y
+                };
 
                 switch (event.key) {
                     case 'a':
                     case 'ArrowLeft':
                         // move left
-                        this.player.x -= 1;
+                        next.x -= 1;
                         break;
                     case 'd':
                     case 'ArrowRight':
-                        this.player.x += 1;
+                        next.x += 1;
                         // move right
                         break;
                     case 'w':
                     case 'ArrowUp':
                         // move up
-                        this.player.y -= 1;
+                        next.y -= 1;
                         break;
                     case 's':
                     case 'ArrowDown':
                         // move down
-                        this.player.y += 1;
+                        next.y += 1;
                         break;
+                }
+
+                // basic collision detection
+                if (MAP[next.x][next.y] === EMPTY) {
+                    this.player = next;
                 }
 
                 this.renderMap();
