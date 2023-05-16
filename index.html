@@ -12,16 +12,21 @@
         const EMPTY = 0;
         const PLAYER = 1;
         const WALL = 2;
+        const KEY = 3;
+        const ENEMY = 4;
 
         // TODO: need a map editor :(
+        // 16w x 20h -- need to include map width/height in data structure
+        // in this representation, the upper left corner is (0,0); x increases
+        // as you go down, y increases as you go right
         const MAP = [
             [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
             [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
             [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2],
             [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
             [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+            [2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
             [2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
             [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
             [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
@@ -33,11 +38,25 @@
             [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
         ];
 
+        const MAP_WIDTH = 16;
+        const MAP_HEIGHT = 20;
+
+        // enemies and items should be able to be placed in the map
+        // items can be kept in the map data; when the player moves on to them they are "collected"
+        // and then the cell data is changed to "empty"
+        // enemy positions will be parsed into an in-memory data structure (because they have the ability to move)
+        // and the original value of the cell can be changed to "empty" after that initial read
+
+        // need to have an update loop that runs independently of player movement, so enemies can move
+        // even when the player is not moving
+
         class Challenge extends Grid {
             cssClassMap = {
                 0: 'empty',
                 1: 'player',
-                2: 'wall'
+                2: 'wall',
+                3: 'key',
+                4: 'enemy'
             };
 
             constructor() {
@@ -51,6 +70,8 @@
                     y: 5
                 };
 
+                this.inventory = [];
+
                 this.renderMap();
 
                 this.gameOver = false;
@@ -59,31 +80,80 @@
 
                 const gridRef = document.querySelector('#grid');
                 grid.addEventListener('touchstart', e => console.log('TODO touchstart'));
+
+                // update enemy state independently of player movement
+                window.setInterval(this.moveEnemies.bind(this), 500);
             }
 
             renderMap() {
                 let state = this.displayStateCopy();
 
-                // TODO: extract to "renderMap" function
-                let startX = this.player.x - 5 < 0 ? 0 : this.player.x - 5;
-                let startY = this.player.y - 5 < 0 ? 0 : this.player.y - 5;
-                console.log(startX, startY);
+                // similar to something like minesweeper, in this game the grid is just for display,
+                // rather than both display _and_ game state. we have a level map stored in a separate
+                // data structure, and use the player's current location in the map to determine
+                // which parts to render to the screen (e.g. the bits that the player is close to)
 
+                // determine where to start drawing the map onto the visible game grid
+                let startX;
+                let startY;
+
+                // TODO: get rid of these magic numbers
+
+                // player is too close to the right edge of the map
+                if (this.player.x >= MAP_WIDTH - 5) {
+                    startX = MAP_WIDTH - 11;
+                } else {
+                    // ensure no negative drawing index
+                    startX = this.player.x - 5 < 0 ? 0 : this.player.x - 5;
+                }
+
+                // player is too close to the bottom of the map
+                if (this.player.y >= MAP_HEIGHT - 5) {
+                    startY = MAP_HEIGHT - 11;
+                } else {
+                    // ensure no negative drawing index
+                    startY = this.player.y - 5 < 0 ? 0 : this.player.y - 5;
+                }
+
+                // draw the area of the map that the player is in
                 for (let x = 0; x < this.columns; x += 1) {
                     for (let y = 0; y < this.rows; y += 1) {
-                        // NOTE: need to prevent accessing OOB map indices
                         state[x][y] = MAP[startX + x][startY + y];
                     }
                 }
 
                 // NOTE: the player always will be rendered in the middle of the grid,
                 // unless they are close to a wall
-                // TODO: currently hard-coded; this needs to be dynamic if player is less
-                // than 5 cells away from an edge of the map data
-                state[5][5] = PLAYER;
+                let playerDrawX = 5;
+                let playerDrawY = 5;
 
+                // TODO: combine these conditions w/ the map drawing above
+
+                if (startX === 0 && this.player.x < 5) {
+                    playerDrawX = this.player.x;
+                }
+
+                if (startY === 0 && this.player.y < 5) {
+                    playerDrawY = this.player.y;
+                }
+
+                if (startX === MAP_WIDTH - 11 && this.player.x >= MAP_WIDTH - 5) {
+                    // what should this value be?
+                    playerDrawX = this.player.x - startX;
+                }
+
+                if (startY === MAP_HEIGHT - 11 && this.player.y >= MAP_HEIGHT - 5) {
+                    playerDrawY = this.player.y - startY;
+                }
+
+                state[playerDrawX][playerDrawY] = PLAYER;
 
                 this.render(state);
+            }
+
+            moveEnemies() {
+                // enumerate through enemy list, and move them as needed;
+                // call `renderMap` if they are within viewing bounds of the player
             }
 
             onKeyDown(event) {
