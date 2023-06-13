@@ -17,34 +17,45 @@
             'down': 13
         };
         const WALL = 2;
-        const KEY = 3;
+        const CHIP = 3;
         const ENEMY = 4;
+        const BLOCK = 5; // movable block, sokoban style
+        const EXIT = 6;
+        const WATER = 7;
+        const GREEN_KEY = 14;
+        const GREEN_LOCK = 15;
+        const BLUE_KEY = 16;
+        const BLUE_LOCK = 17;
+        const RED_KEY = 18;
+        const RED_LOCK = 19;
+        const YELLOW_KEY = 20;
+        const YELLOW_LOCK = 21;
+        const SOCKET = 22;
 
         // TODO: need a map editor :(
-        // 16w x 20h -- need to include map width/height in data structure
+        // need to include map width/height in data structure
         // in this representation, the upper left corner is (0,0); x increases
         // as you go down, y increases as you go right
         const MAP = [
-            [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            [2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2],
-            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            [2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            [2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2],
-            [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-            [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+            [0, 0, 0, 2,  2,  2,  2, 2,  2,  2,  0, 0, 0,  0],
+            [0, 0, 0, 2,  0,  0,  2, 0,  0,  2,  0, 0, 0,  0],
+            [2, 2, 2, 2,  20, 3,  2, 3,  0,  2,  0, 0, 0,  0],
+            [2, 0, 0, 2,  0,  0,  2, 0,  0,  2,  0, 0, 0,  0],
+            [2, 0, 3, 2,  17, 2,  2, 2,  19, 2,  2, 2, 2,  2],
+            [2, 0, 0, 15, 0,  16, 3, 16, 0,  2,  0, 0, 0,  2],
+            [2, 2, 2, 2,  0,  0,  0, 0,  0,  21, 0, 3, 14, 2],
+            [0, 2, 6, 22, 0,  0,  0, 0,  3,  2,  2, 2, 2,  2],
+            [2, 2, 2, 2,  0,  0,  0, 0,  0,  21, 0, 3, 0,  2],
+            [2, 0, 0, 15, 0,  18, 3, 18, 0,  2,  0, 0, 0,  2],
+            [2, 0, 3, 2,  19, 2,  2, 2,  17, 2,  2, 2, 2,  2],
+            [2, 0, 0, 2,  0,  0,  2, 0,  0,  2,  0, 0, 0,  0],
+            [2, 2, 2, 2,  20, 3,  2, 3,  0,  2,  0, 0, 0,  0],
+            [0, 0, 0, 2,  0,  0,  2, 0,  0,  2,  0, 0, 0,  0],
+            [0, 0, 0, 2,  2,  2,  2, 2,  2,  2,  0, 0, 0,  0],
         ];
 
-        const MAP_WIDTH = 16;
-        const MAP_HEIGHT = 20;
+        const MAP_WIDTH = 15;
+        const MAP_HEIGHT = 14;
 
         // enemies and items should be able to be placed in the map
         // items can be kept in the map data; when the player moves on to them they are "collected"
@@ -60,12 +71,24 @@
                 0: 'empty',
                 1: 'player',
                 2: 'wall',
-                3: 'key',
+                3: 'chip',
                 4: 'enemy',
+                5: 'block',
+                6: 'exit',
+                7: 'water',
                 10: 'player-left',
                 11: 'player-right',
                 12: 'player-up',
                 13: 'player-down',
+                14: 'green-key',
+                15: 'green-lock',
+                16: 'blue-key',
+                17: 'blue-lock',
+                18: 'red-key',
+                19: 'red-lock',
+                20: 'yellow-key',
+                21: 'yellow-lock',
+                22: 'socket'
             };
 
             constructor() {
@@ -74,9 +97,10 @@
 
                 super(rows, columns);
 
+                // TODO: parse map data to find player position
                 this.player = {
-                    x: 5,
-                    y: 5,
+                    x: 7,
+                    y: 6,
                     direction: 'down'
                 };
 
@@ -208,6 +232,29 @@
                 if (MAP[next.x][next.y] === EMPTY) {
                     this.player.x = next.x;
                     this.player.y = next.y;
+                }
+
+                // move blocks
+                if (MAP[next.x][next.y] === BLOCK) {
+                    // check if the block can move to the next space
+                    // TODO: instead of using `next = {x, y}`, might have to do `diff = {x:(1,-1), y:(1, -1)}` so that
+                    // we can tell the direction that the block needs to go, rather than just the endpoint of the player
+
+                    // if block[next.x][next.y] === EMPTY
+                    //      then move the block in the actual map data
+                    //      move the player's position in `this.player`
+
+                    // this.player.x = next.x;
+                    // this.player.y = next.y;
+                }
+
+                // TODO: if the player background image has transparency, CSS can be layered
+                // such that we can show the player on top of another tile
+                if (MAP[next.x][next.y] === EXIT) {
+                    this.player.x = next.x;
+                    this.player.y = next.y;
+
+                    window.alert('You found the exit!');
                 }
 
                 this.renderMap();

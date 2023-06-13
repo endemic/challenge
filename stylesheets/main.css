@@ -12,3 +12,16 @@ body {
 #grid div.player-up { background: url('../images/player-up.png') center/100%; }
 #grid div.player-down { background: url('../images/player-down.png') center/100%; }
 #grid div.wall { background: url('../images/wall.png') center/100%; }
+#grid div.block { background: url('../images/block.png') center/100%; }
+#grid div.exit { background: url('../images/exit.png') center/100%; }
+#grid div.water { background: url('../images/water.png') center/100%; }
+#grid div.blue-key { background: url('../images/blue-key.png') center/100%; }
+#grid div.blue-lock { background: url('../images/blue-lock.png') center/100%; }
+#grid div.chip { background: url('../images/chip.png') center/100%; }
+#grid div.green-key { background: url('../images/green-key.png') center/100%; }
+#grid div.green-lock { background: url('../images/green-lock.png') center/100%; }
+#grid div.socket { background: url('../images/socket.png') center/100%; }
+#grid div.yellow-key { background: url('../images/yellow-key.png') center/100%; }
+#grid div.yellow-lock { background: url('../images/yellow-lock.png') center/100%; }
+#grid div.red-key { background: url('../images/red-key.png') center/100%; }
+#grid div.red-lock { background: url('../images/red-lock.png') center/100%; }
